@@ -379,3 +379,5 @@ cd bin
 ```
 
 - Then run the executable
+
+- Good bye bats ^*^
