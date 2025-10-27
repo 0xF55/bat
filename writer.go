@@ -25,7 +25,6 @@ func NewWriter() *oWriter {
 }
 
 func (w *oWriter) Write(data string) {
-	defer w.stream.Sync()
 
 	data_bytes := []byte(data)
 	data_bytes = append(data_bytes, 0x0A) // new line

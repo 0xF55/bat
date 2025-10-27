@@ -164,10 +164,8 @@ func (p *Parser) ParseOut() {
 
 		value2 := p.CurrentToken.VALUE.(string)
 		if value2 == "*" {
-			for k, v := range Variables {
-				if k != "out" {
-					Writer.Write(v)
-				}
+			for _, v := range Variables {
+				Writer.Write(v)
 			}
 			return
 		}

@@ -8,11 +8,41 @@
 **bat** is tool & DSL language for wordlist generating
 
 - Why bat ? :
-    * Very fast (Golang Based)
+    * fast Generating & Parsing (Golang Based)
     * Easy syntax
     * Allow many patterns
     * User Friendly
     * Flexible (No Specific Pattern)
+
+- Example:
+
+```
+name=victim
+age=25
+
+for i=2000..2026
+    @$name$age,_$i
+end
+```
+
+- Sample of Output: 
+
+```
+victim25_2000
+mitciv25_2000
+victim25_2001
+mitciv25_2001
+victim25_2002
+mitciv25_2002
+victim25_2003
+mitciv25_2003
+victim25_2004
+mitciv25_2004
+victim25_2005
+mitciv25_2005
+victim25_2006
+....
+```
 
 ## Docs
 
