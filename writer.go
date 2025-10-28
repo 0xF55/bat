@@ -1,15 +1,32 @@
 package main
 
 import (
+	"bytes"
 	"log"
 	"os"
+	"sync"
 )
 
+// for main writer
 type oWriter struct {
-	name   string // file name
-	lines  int    // wroted lines
-	stream *os.File
+	mux    sync.RWMutex
+	name   string   // file name
+	lines  int      // final wroted lines
+	stream *os.File // file
 }
+
+// for every bat file
+type bWriter struct {
+	buffer bytes.Buffer
+	lines  int
+}
+
+func (bW *bWriter) Write(data string) {
+	bW.buffer.WriteString(data + "\n")
+	bW.lines++
+}
+
+/* These two functions for the main writer */
 
 func NewWriter() *oWriter {
 	writer := &oWriter{}
@@ -24,10 +41,10 @@ func NewWriter() *oWriter {
 	return writer
 }
 
-func (w *oWriter) Write(data string) {
-
-	data_bytes := []byte(data)
-	data_bytes = append(data_bytes, 0x0A) // new line
+func (w *oWriter) Write(bW *bWriter) {
+	w.mux.Lock()
+	defer w.mux.Unlock()
+	data_bytes := bW.buffer.Bytes()
 	w.stream.Write(data_bytes)
-	w.lines += 1
+	w.lines += bW.lines
 }

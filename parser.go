@@ -1,7 +1,26 @@
+/*
+   Copyright [2025] [0xf55]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+*/
+
 package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -13,12 +32,16 @@ type Parser struct {
 	CurrentToken Token
 	Position     int
 	PeekPosition int
+	Writer       *bWriter
+	Lists        map[string]*[]string
+	Variables    map[string]string
 }
 
-/* Maps For Storing Vars,Lists */
-var Variables map[string]string
-var Lists map[string]*[]string
+/* Main Writer */
 var Writer *oWriter
+
+/* Cache for reversed strings in loops */
+var ReversedCache map[string]string
 
 func NewParser(tokens []Token) *Parser {
 
@@ -28,11 +51,9 @@ func NewParser(tokens []Token) *Parser {
 	parser.Position = 0
 	parser.PeekPosition = parser.Position + 1
 	parser.CurrentToken = parser.Tokens[parser.Position]
-
-	Variables = make(map[string]string)
-	Lists = make(map[string]*[]string)
-	// default output value
-	Writer = NewWriter()
+	parser.Writer = &bWriter{}
+	parser.Lists = make(map[string]*[]string)
+	parser.Variables = make(map[string]string)
 
 	return parser
 
@@ -68,19 +89,7 @@ func (p *Parser) PeekToken() Token {
 }
 
 func (p *Parser) PeekIs(Type TokenType) bool {
-
 	return p.PeekToken().Type == Type
-
-}
-
-func (p *Parser) BackToken() Token {
-	return p.Tokens[p.PeekPosition]
-}
-
-func (p *Parser) BackIs(Type TokenType) bool {
-
-	return p.BackToken().Type == Type
-
 }
 
 func (p *Parser) TokenAt(index int) Token {
@@ -135,24 +144,24 @@ func (p *Parser) ParseAssignment() {
 					if strings.TrimSpace(value) == "" {
 						continue
 					}
-					new_list = append(new_list, Eval(value))
+					new_list = append(new_list, p.Eval(value))
 				}
 			} // end loop
 
 			// add list
-			Lists[ident] = &new_list
+			p.Lists[ident] = &new_list
 			return
 
 		} // end if
 	}
 
-	value := ""
+	value := strings.Builder{}
 	for p.TokenIs(LITERAL, VAR_NEEDED, COMMA) {
-		value += p.CurrentToken.VALUE.(string)
+		value.WriteString(p.CurrentToken.VALUE.(string))
 		p.NextToken()
 	}
 
-	Variables[ident] = Eval(value)
+	p.Variables[ident] = p.Eval(value.String())
 
 }
 
@@ -164,8 +173,8 @@ func (p *Parser) ParseOut() {
 
 		value2 := p.CurrentToken.VALUE.(string)
 		if value2 == "*" {
-			for _, v := range Variables {
-				Writer.Write(v)
+			for _, v := range p.Variables {
+				p.Writer.Write(v)
 			}
 			return
 		}
@@ -173,11 +182,11 @@ func (p *Parser) ParseOut() {
 		p.NextToken()
 	}
 
-	Writer.Write(Eval(value))
+	p.Writer.Write(p.Eval(value))
 
 }
 
-func (p *Parser) ParseLoop() {
+func (p *Parser) ParseLoop(in_loop bool) {
 
 	p.NextToken()
 	ctx := LoopCTX{}
@@ -186,13 +195,13 @@ func (p *Parser) ParseLoop() {
 		// declare the iterator
 		val := p.CurrentToken.VALUE.(string)
 		ctx.Iterator = val
-		Variables[val] = ""
+		p.Variables[val] = ""
 		p.NextToken()
 		switch p.CurrentToken.Type {
 		// should be range -> 1..10 or file
 		case LITERAL:
 			name := p.CurrentToken.VALUE.(string)
-			Type, res := GetList(name)
+			Type, res := p.GetList(name)
 			if res == nil {
 				// it's a file ?
 				file, err := os.Open(name)
@@ -211,14 +220,13 @@ func (p *Parser) ParseLoop() {
 		case VAR_NEEDED:
 			name := p.CurrentToken.VALUE.(string)
 			name = strings.Trim(name, "$")
-			Type, res := GetList(name)
+			Type, res := p.GetList(name)
 			ctx.Type = Type
 			ctx.Expr = res
 
 		}
 	} else {
 		log.Fatal("Invalid Loop Expression")
-		return
 	}
 
 	loop_start := p.Position
@@ -226,8 +234,8 @@ func (p *Parser) ParseLoop() {
 	for i := p.Position; i < p.TokensLength; i++ {
 		if p.TokenAt(i).Type == KEYWORD_END {
 			ret_pos = i
-			for ctx.Next() {
-				p.Parse(loop_start, i)
+			for ctx.Next(p) {
+				p.Parse(loop_start, i, in_loop)
 			}
 			break
 		}
@@ -235,38 +243,64 @@ func (p *Parser) ParseLoop() {
 	}
 
 	if ret_pos == 0 {
-		log.Fatalf("Missing end block for the loop")
+		log.Fatalf("Missing end keyword for the loop")
 		return
 	}
 
-	p.Goto(ret_pos)
+	if !in_loop {
+		p.Goto(ret_pos)
+		p.NextToken()
+	}
+
+}
+
+func (p *Parser) ParseDirective() {
+
+	p.NextToken()
+
+	switch p.CurrentToken.Type {
+	case LITERAL, VAR_NEEDED:
+		ExecuteDirective(p.Eval(p.CurrentToken.VALUE.(string)))
+	default:
+		return
+	}
+
 	p.NextToken()
 
 }
 
 // start from position to position (main = 0,end)
-func (p *Parser) Parse(start, end int) {
+func (p *Parser) Parse(start, end int, in_loop bool) {
 	if p.TokensLength <= 1 {
 		log.Fatal("Too short script :(")
 		return
 	}
-	p.Position = start
-	p.PeekPosition = p.Position + 1
-	p.CurrentToken = p.Tokens[p.Position]
 
-	for p.CurrentToken.Type != 0 {
+	p.Goto(start)
+
+	for p.CurrentToken.Type != 0 && p.Position < end {
 		switch p.CurrentToken.Type {
 		case IDENTIFIER:
 			p.ParseAssignment()
 		case KEYWORD_OUT:
 			p.ParseOut()
 		case KEYWORD_FOR:
-			p.ParseLoop()
+			p.ParseLoop(in_loop)
+		case DIRECTIVE:
+			p.ParseDirective()
 		case KEYWORD_END, COMMA:
 			p.NextToken()
 		default:
 			p.NextToken()
 		}
 	}
+
+	if !Quiet {
+		fmt.Printf("\rLines:          %d", Writer.lines)
+	}
+	Writer.Write(p.Writer)
+
+	p.Writer.buffer.Reset()
+	p.Writer.lines = 0
 
 }

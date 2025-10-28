@@ -32,7 +32,7 @@ type LoopCTX struct {
 	Expr     interface{}
 }
 
-func (ctx *LoopCTX) Next() bool {
+func (ctx *LoopCTX) Next(p *Parser) bool {
 
 	switch ctx.Type {
 	case List:
@@ -41,7 +41,7 @@ func (ctx *LoopCTX) Next() bool {
 		if listLoop.Position >= listLoop.Length || listLoop.Length == 0 {
 			return false
 		}
-		Variables[ctx.Iterator] = (*listLoop.List)[listLoop.Position]
+		p.Variables[ctx.Iterator] = (*listLoop.List)[listLoop.Position]
 		return true
 
 	case Range:
@@ -51,13 +51,13 @@ func (ctx *LoopCTX) Next() bool {
 			return false
 		}
 		num := strconv.Itoa(rangeLoop.Position)
-		Variables[ctx.Iterator] = num
+		p.Variables[ctx.Iterator] = num
 		return true
 
 	case File:
 		fileLoop := ctx.Expr.(*FileLoop)
 		if fileLoop.Scanner.Scan() {
-			Variables[ctx.Iterator] = fileLoop.Scanner.Text()
+			p.Variables[ctx.Iterator] = fileLoop.Scanner.Text()
 			return true
 		}
 		return false

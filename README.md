@@ -48,15 +48,19 @@ victim25_2006
 
 ---
 
+
 ### Escape Charachters
 
-**Space:** `$S`
+| Escape Code | Replaced With |
+|--------------|---------------|
+| `SP`         | (space)       |
+| `COM`        | ,             |
+| `RSA`        | (             |
+| `RCL`        | )             |
+| `DS`         | $             |
+| `EQ`         | =             |
+| `AT`         | @             |
 
-**$:** `$D`
-
-**@:** `$A`
-
-**=:** `$E`
 
 
 ### Special Variables
@@ -369,6 +373,46 @@ bat1970:1:11
 
 ```
 
+## Directives
+
+- Directive is a command given to the parser to change its behaviour
+
+- Directive Symbol is `|`
+
+- Example:
+
+*Change The Charset*
+- charset is used for random generating
+
+- charset lower only
+```
+|charset:lower
+```
+
+- charset upper only
+
+```
+|charset:upper
+```
+
+- all
+
+```
+|charset:all
+```
+
+- custom
+```
+|charset:abcfyl
+```
+
+- Same for special chars
+
+**Note!** Dont use literal value here like @ or , or =,.. *Use* **Escape Charachters**
+
+```
+|special:`AT``COM``EQ`
+```
 
 ## Rules
 
@@ -391,7 +435,7 @@ for i = 1..5
 end
 ```
 
-- You can't use @,$,= as literal value, instead use Escape Charachters $D,$A,$E
+- You can't use @,$,= as literal value, instead use Escape Charachters 
 * Warning: if u use it , the program will be in recursive loop
 
 ---

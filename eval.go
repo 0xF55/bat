@@ -1,3 +1,21 @@
+/*
+   Copyright [2025] [0xf55]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+*/
+
 package main
 
 import (
@@ -8,18 +26,10 @@ import (
 	"strings"
 )
 
-func GetVar(name string) string {
+func (p *Parser) GetVar(name string) string {
 
 	name = strings.Trim(name, "$")
 	switch name {
-	case "S":
-		return " "
-	case "D":
-		return "`DS`" // dolar $
-	case "E":
-		return "`EQ`" // equal =
-	case "A":
-		return "`AT`" // at @
 	default:
 		lower := strings.ToLower(name)
 		ret := ""
@@ -42,7 +52,7 @@ func GetVar(name string) string {
 		case '+', '-', '^', '~', '!':
 			name = strings.Trim(name, string(f))
 		}
-		ret = string(Variables[name])
+		ret = string(p.Variables[name])
 		switch f {
 		case '+':
 			ret = strings.ToUpper(ret)
@@ -65,32 +75,32 @@ func GetVar(name string) string {
 
 func UnEscape(text string) string {
 
-	replacer := strings.NewReplacer("`DS`", "$", "`EQ`", "=", "`AT`", "@")
+	replacer := strings.NewReplacer("`SP`", " ", "`COM`", ",", "`RSA`", "(", "`RCL`", ")", "`DS`", "$", "`EQ`", "=", "`AT`", "@")
 
 	return replacer.Replace(text)
 
 }
 
-func EvalExpression(text string) string {
+func (p *Parser) EvalExpression(text string) string {
 	varegex := regexp.MustCompile(`\$\s*[\+\-\~\^\!\*]?\w+(?::\d+)?`) // $?var || $gen:n
 	comma_sp := strings.Split(text, ",")
 	var ret strings.Builder
 
 	for _, expr := range comma_sp {
 		expr = varegex.ReplaceAllStringFunc(expr, func(match string) string {
-			return GetVar(match)
+			return p.GetVar(match)
 		})
 		ret.WriteString(expr)
 	}
 	return ret.String()
 }
 
-func Eval(text string) string {
-	ret := UnEscape(EvalExpression(text))
+func (p *Parser) Eval(text string) string {
+	ret := UnEscape(p.EvalExpression(text))
 	return ret
 }
 
-func GetList(name string) (int8, any) {
+func (p *Parser) GetList(name string) (int8, any) {
 
 	if strings.Contains(name, "..") {
 		Splitted := strings.Split(name, "..")
@@ -116,7 +126,7 @@ func GetList(name string) (int8, any) {
 	} else {
 		name = strings.Trim(name, "$")
 
-		listPtr := Lists[name]
+		listPtr := p.Lists[name]
 		if listPtr == nil {
 			return 0, nil
 		}

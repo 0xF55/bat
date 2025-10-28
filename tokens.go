@@ -12,6 +12,7 @@ const (
 	ROUND_END             // )
 	LITERAL               // value
 	COMMA                 // ,
+	DIRECTIVE             // |
 )
 
 type Token struct {

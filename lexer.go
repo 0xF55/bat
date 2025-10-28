@@ -48,7 +48,7 @@ func (l *Lexer) currch() byte {
 
 // is delimiter
 func (l *Lexer) isdelem(char byte) bool {
-	return char == ' ' || char == '=' || char == '\n' || char == '\t' || char == '\r' || char == ',' || char == '(' || char == ')'
+	return char == ' ' || l.currentchar == '|' || char == '=' || char == '\n' || char == '\t' || char == '\r' || char == ',' || char == '(' || char == ')'
 }
 
 // read one char
@@ -118,6 +118,9 @@ func (l *Lexer) NextToken() bool {
 	case ',':
 		tokenType = COMMA
 		token.VALUE = ","
+	case '|':
+		tokenType = DIRECTIVE
+		token.VALUE = "|"
 	default:
 		word := l.readliteral()
 		switch word {

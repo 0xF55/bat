@@ -1,3 +1,21 @@
+/*
+   Copyright [2025] [0xf55]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+*/
+
 package main
 
 import (
@@ -7,8 +25,10 @@ import (
 	"unsafe"
 )
 
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-const special = "#!_*@="
+var Lower = "abcdefghijklmnopqrstuvwxyz"
+var Upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+var Charset string
+var Special string
 
 func charUpper(char byte) string {
 	ret := strings.ToUpper(string(char))
@@ -71,10 +91,10 @@ func RandSpecial(expr string) string {
 		return ""
 	}
 	replacer := strings.NewReplacer("$", "`DS`", "=", "`EQ`", "@", "`AT`")
-	l := len(special)
+	l := len(Special)
 	for i := 0; i < num; i++ {
 		n := rand.Intn(l)
-		str += replacer.Replace(string(special[n]))
+		str += replacer.Replace(string(Special[n]))
 	}
 
 	return str
@@ -87,20 +107,26 @@ func RandChar(expr string) string {
 	if err != nil || num == 0 {
 		return ""
 	}
-	l := len(charset)
+	l := len(Charset)
 	for i := 0; i < num; i++ {
 		n := rand.Intn(l)
-		str += string(charset[n])
+		str += string(Charset[n])
 	}
 
 	return str
 }
 
 func Reverse(s string) string {
+	cached := ReversedCache[s]
+	if cached != "" {
+		return cached
+	}
 	n := len(s)
 	out := make([]byte, n)
 	for i := 0; i < n; i++ {
 		out[n-1-i] = s[i]
 	}
-	return unsafe.String(&out[0], n)
+	str := unsafe.String(&out[0], n)
+	ReversedCache[s] = str
+	return str
 }
