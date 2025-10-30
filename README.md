@@ -5,6 +5,10 @@
   <img src="images/Bat.png" alt="batman" width="500"/>
 </p>
 
+![Bat License](https://img.shields.io/github/license/0xf55/bat)
+![Bat Starts](https://img.shields.io/github/stars/0xf55/bat?style=flat&label=Stars)
+![Bat Forks](https://img.shields.io/github/forks/0xf55/bat?style=flat&label=Forks)
+
 **bat** is tool & DSL language for wordlist generating
 
 - Why bat ? :
