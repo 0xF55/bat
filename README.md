@@ -1,4 +1,4 @@
-## Bat
+## Bat *Wordlist Generation Tool*
 
 
 <p align="center">
@@ -46,6 +46,19 @@ victim25_2005
 mitciv25_2005
 victim25_2006
 ....
+```
+
+## Benchmark
+
+- For 2 million password
+
+- Kali VMWare 5gb ram,2 cpu cores
+- Time: about 20 second
+
+```
+➜  bat time ./bat -q
+./bat -q  18.61s user 2.79s system 105% cpu 20.197 total
+
 ```
 
 ## Docs
