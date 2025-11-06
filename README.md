@@ -50,7 +50,7 @@ victim25_2006
 
 ## Benchmark
 
-- For 2 million password
+- For 2 million password with complex patterns
 
 - Kali VMWare 5gb ram,2 cpu cores
 - Time: about 20 second
@@ -431,29 +431,12 @@ bat1970:1:11
 |special:`AT``COM``EQ`
 ```
 
+- Try to make the code tidy like in documentation
+
+
 ## Rules
 
-- Space in lists or variables not allowed
-
-**Correct**
-```
-name=bat
-list=(1,2,3,4,5,6)
-for i=1..5
-end
-```
-**Incorrect**
-```
-name = bat
-list=(1 , 2 , 3, ,4)
-list = (1,2,3,4,5,6)
-for i = 1..5
-    @$i
-end
-```
-
 - You can't use @,$,= as literal value, instead use Escape Charachters 
-* Warning: if u use it , the program will be in recursive loop
 
 ---
 

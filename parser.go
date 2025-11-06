@@ -235,7 +235,7 @@ func (p *Parser) ParseLoop(in_loop bool) {
 		if p.TokenAt(i).Type == KEYWORD_END {
 			ret_pos = i
 			for ctx.Next(p) {
-				p.Parse(loop_start, i, in_loop)
+				p.Parse(loop_start, i, true)
 			}
 			break
 		}

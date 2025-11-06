@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
+	"regexp"
 )
 
 type Lexer struct {
@@ -15,16 +15,30 @@ type Lexer struct {
 	tokens       []Token
 }
 
+// this function remove spaces before & after `=` & `..`
+func cleanerFunction(code string) *string {
+
+	re := regexp.MustCompile(`\s*=\s*`)
+
+	cleaned := re.ReplaceAllString(code, "=")
+
+	reDots := regexp.MustCompile(`\s*\.\.\s*`)
+
+	cleaned = reDots.ReplaceAllString(cleaned, "..")
+
+	return &cleaned
+}
+
 func NewLexer(source_file string) *Lexer {
 
 	// read file
 	data, err := os.ReadFile(source_file)
 	if err != nil {
-		log.Fatal("Failed to read bat script file")
+		log.Fatal("Failed to read bat file")
 	}
 
 	lexer := &Lexer{}
-	lexer.input = string(data)
+	lexer.input = *cleanerFunction(string(data))
 	lexer.leninput = len(lexer.input)
 	lexer.init()
 	return lexer
@@ -153,11 +167,4 @@ func (l *Lexer) Lex() {
 	for l.NextToken() {
 	}
 
-}
-
-// for debugging
-func (l *Lexer) Print() {
-	for _, token := range l.tokens {
-		fmt.Printf("%d %s\n", token.Type, token.VALUE)
-	}
 }

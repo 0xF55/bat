@@ -5,7 +5,7 @@ import "fmt"
 const (
 	Major int8 = 1
 	Minor int8 = 1
-	Patch int8 = 0
+	Patch int8 = 1
 )
 
 func ShowVersion() {
