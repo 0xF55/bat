@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"strconv"
 )
 
@@ -14,6 +15,7 @@ type ListLoop struct {
 type RangeLoop struct {
 	Position int // start
 	Length   int // end
+	ZeroPad  int
 }
 
 type FileLoop struct {
@@ -50,8 +52,14 @@ func (ctx *LoopCTX) Next(p *Parser) bool {
 		if rangeLoop.Position >= rangeLoop.Length || rangeLoop.Length == 0 {
 			return false
 		}
-		num := strconv.Itoa(rangeLoop.Position)
-		p.Variables[ctx.Iterator] = num
+
+		if rangeLoop.ZeroPad != 0 {
+			p.Variables[ctx.Iterator] = fmt.Sprintf("%0*d", rangeLoop.ZeroPad, rangeLoop.Position)
+		} else {
+			num := strconv.Itoa(rangeLoop.Position)
+			p.Variables[ctx.Iterator] = num
+
+		}
 		return true
 
 	case File:

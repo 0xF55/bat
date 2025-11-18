@@ -15,6 +15,8 @@ func ExecuteDirective(expr string) {
 		case "charset":
 			mode := sp[1]
 			switch mode {
+			case "with_numbers":
+				Charset += Numbers
 			case "lower":
 				Charset = Lower
 			case "upper":

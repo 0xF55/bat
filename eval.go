@@ -102,8 +102,19 @@ func (p *Parser) Eval(text string) string {
 
 func (p *Parser) GetList(name string) (int8, any) {
 
-	if strings.Contains(name, "..") {
-		Splitted := strings.Split(name, "..")
+	// is a file loop
+	if name[0] == '%' {
+		return File, nil
+	}
+
+	count := strings.Count(name, ".")
+	sp := ".."
+
+	if count > 0 {
+		if count == 1 {
+			sp = "."
+		}
+		Splitted := strings.Split(name, sp)
 		if len(Splitted) != 2 || Splitted[1] == "" {
 			log.Fatalf("Invalid Range Expression: %s", name)
 		}
@@ -120,6 +131,9 @@ func (p *Parser) GetList(name string) (int8, any) {
 		Rng := RangeLoop{}
 		Rng.Position = -1 + n1
 		Rng.Length = n2
+		if count == 1 {
+			Rng.ZeroPad = len(Splitted[1])
+		}
 
 		return Range, &Rng
 

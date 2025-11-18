@@ -1,0 +1,13 @@
+|charset:lower
+
+base_word=Anonymous
+
+for i=1..500
+    @$base_word$rndc:5
+end
+
+|charset:ABCDEF0123456789
+
+for i=1..500
+    @$base_word$rndc:4
+end

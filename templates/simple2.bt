@@ -1,0 +1,20 @@
+name=John
+father=Doe
+nickname=Bat
+birth_year=1990
+
+for year=2015..2026
+    @$name$year
+
+    @$!name$year
+
+    @$father$birth_year
+
+    @$~name$father
+
+    @$^father$name
+
+    @$name$father$year
+end
+
+@$name$father`AT`$birth_year

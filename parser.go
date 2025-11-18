@@ -24,6 +24,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 type Parser struct {
@@ -204,7 +206,7 @@ func (p *Parser) ParseLoop(in_loop bool) {
 			Type, res := p.GetList(name)
 			if res == nil {
 				// it's a file ?
-				file, err := os.Open(name)
+				file, err := os.Open(strings.Trim(name, "%"))
 				if err != nil {
 					log.Fatalf("Unknown: %s", name)
 					return
@@ -231,8 +233,18 @@ func (p *Parser) ParseLoop(in_loop bool) {
 
 	loop_start := p.Position
 	ret_pos := 0
+	loops := 0
+
 	for i := p.Position; i < p.TokensLength; i++ {
+		/* Fixed Error in loops logic in 1.2.0*/
+		if p.TokenAt(i).Type == KEYWORD_FOR {
+			loops++
+		}
 		if p.TokenAt(i).Type == KEYWORD_END {
+			if loops > 0 {
+				loops--
+				continue
+			}
 			ret_pos = i
 			for ctx.Next(p) {
 				p.Parse(loop_start, i, true)
@@ -296,7 +308,7 @@ func (p *Parser) Parse(start, end int, in_loop bool) {
 	}
 
 	if !Quiet {
-		fmt.Printf("\rLines:          %d", Writer.lines)
+		fmt.Printf(color.GreenString("\r> Lines:        %d", Writer.lines))
 	}
 	Writer.Write(p.Writer)
 

@@ -29,6 +29,7 @@ var Lower = "abcdefghijklmnopqrstuvwxyz"
 var Upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 var Charset string
 var Special string
+var Numbers string
 
 func charUpper(char byte) string {
 	ret := strings.ToUpper(string(char))

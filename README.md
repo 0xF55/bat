@@ -26,6 +26,7 @@ age=25
 
 for i=2000..2026
     @$name$age,_$i
+    @$!name$age,_$i
 end
 ```
 
@@ -186,6 +187,28 @@ mohamed_8
 mohamed_9
 ```
 
+- Loop with zero padding
+
+```bat
+
+for i=1.100
+
+@$i
+
+end
+
+```
+
+**Sample**
+
+```
+001
+002
+003
+004
+...
+```
+
 - List
 
 ```bat
@@ -230,7 +253,7 @@ end
 - Iterate Over File
 
 ```bat
-for i=test.txt
+for i=%test.txt
     @hello$i
 end
 ```
@@ -358,7 +381,7 @@ name=bat
 for y=1970..2026
   for m=1..13
     for d=1..31
-    @$name$y:$m:d
+    @$name$y:$m:$d
     end
   end
 end
@@ -418,6 +441,12 @@ bat1970:1:11
 |charset:all
 ```
 
+- add numbers to charset
+
+```
+|charset:with_numbers
+```
+
 - custom
 ```
 |charset:abcfyl
@@ -440,6 +469,11 @@ bat1970:1:11
 
 ---
 
+## Templates
+
+- There is a ready for use templates in **templates** folder
+- Make sure to replace required variables with your values
+
 ## Download & Build
 
 - You can download precompiled binaries from releases page
@@ -453,6 +487,14 @@ make build
 cd bin
 ```
 
-- Then run the executable
+- Then you can run the executable
 
-- Good bye bats ^*^
+- For maximum speed, it's recommended to use quiet mode `-q`
+
+## Thanks to
+
+[EmojiCombos](https://emojicombos.com/) for bat ascii art
+
+[Cobra](https://github.com/spf13/cobra) for cli arguments
+
+[Fatih/Color](https://github.com/fatih/color) for cli colors

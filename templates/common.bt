@@ -1,0 +1,20 @@
+name=Mohamed
+
+passwords=(123456,123456789,12345678,password,qwerty123,111111,12345,secret,123123,1234567,000000,qwerty,abc123,password1,iloveyou,11111111,dragon,monkey,admin,welcome)
+
+for passowrd = $passwords
+
+    @$name$passowrd
+    @$name,_$passowrd
+
+end
+
+for yy = 1970..2026
+
+    @$name$yy
+
+end
+
+for i = 0..151
+    @$name$i
+end

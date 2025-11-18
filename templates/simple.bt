@@ -1,0 +1,18 @@
+name=Name
+father=Father
+age=1337
+
+for i = 1..1000
+
+    @$name,_$rndn:4
+    @$name$father$rndn:4
+    
+end
+
+for y=1970..2026
+  for m=1..13
+    for d=1..31
+    @$name$y$m$d
+    end
+  end
+end
