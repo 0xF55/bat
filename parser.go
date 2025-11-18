@@ -308,7 +308,7 @@ func (p *Parser) Parse(start, end int, in_loop bool) {
 	}
 
 	if !Quiet {
-		fmt.Printf(color.GreenString("\r> Lines:        %d", Writer.lines))
+		fmt.Print(color.GreenString("\r> Lines:        %d", Writer.lines))
 	}
 	Writer.Write(p.Writer)
 
