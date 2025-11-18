@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <img src="images/Bat.png" alt="batman" width="500"/>
+  <img src="images/generated.png" alt="batman" width="500"/>
 </p>
 
 ![Bat License](https://img.shields.io/github/license/0xf55/bat)
